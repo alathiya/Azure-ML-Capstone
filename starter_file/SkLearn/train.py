@@ -13,13 +13,14 @@ from sklearn.model_selection import train_test_split
 from azureml.core.workspace import Workspace
 #from azureml.train.automl import AutoMLConfig
 from azureml.core.dataset import Dataset
+from sklearn.metrics import accuracy_score
 
 import joblib
 
 from azureml.core.run import Run
 
 run = Run.get_context()
-
+ws = run.experiment.workspace
 
 def main():
     parser = argparse.ArgumentParser()
@@ -40,14 +41,12 @@ def main():
     #X = iris.data
     #y = iris.target
 
-    ws = Workspace.from_config()
+    
 
     key = "Heart-Failure"
 
-    if key in ws.datasets.keys(): 
-        dataset = ws.datasets[key]
-    
-    df = dataset.to_pandas_dataframe()
+    heart_dataset = Dataset.get_by_name(workspace=ws, name='Heart-Failure')
+    df = heart_dataset.to_pandas_dataframe()
 
     y = df[df.columns[-1]]
     X = df.drop(df.columns[-1],axis=1)
@@ -61,9 +60,9 @@ def main():
     svm_predictions = svm_model_linear.predict(X_test)
 
     # model accuracy for X_test
-    #accuracy = svm_model_linear.score(X_test, y_test)
+    accuracy = accuracy_score(svm_predictions, y_test)
     #print('Accuracy of SVM classifier on test set: {:.2f}'.format(accuracy))
-    #run.log('Accuracy', np.float(accuracy))
+    run.log('accuracy', np.float(accuracy))
     # creating a confusion matrix
     #cm = confusion_matrix(y_test, svm_predictions)
     #print(cm)
