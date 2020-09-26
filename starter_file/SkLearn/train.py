@@ -1,5 +1,3 @@
-# Modified from https://www.geeksforgeeks.org/multiclass-classification-using-scikit-learn/
-
 import argparse
 import os
 
@@ -14,6 +12,7 @@ from azureml.core.workspace import Workspace
 #from azureml.train.automl import AutoMLConfig
 from azureml.core.dataset import Dataset
 from sklearn.metrics import accuracy_score
+from sklearn.preprocessing import StandardScaler
 
 import joblib
 
@@ -37,12 +36,16 @@ def main():
 
     heart_dataset = Dataset.get_by_name(workspace=ws, name='Heart-Failure')
     df = heart_dataset.to_pandas_dataframe()
+    
 
     y = df[df.columns[-1]]
     X = df.drop(df.columns[-1],axis=1)
+    
+    scaler = StandardScaler()
+    scaled_X = scaler.fit_transform(X)
 
     # dividing X, y into train and test data
-    X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=0)
+    X_train, X_test, y_train, y_test = train_test_split(scaled_X, y, random_state=0)
 
     # training a linear SVM classifier
     from sklearn.svm import SVC
@@ -59,7 +62,6 @@ def main():
     os.makedirs('outputs', exist_ok=True)
     # files saved in the "outputs" folder are automatically uploaded into run history
     joblib.dump(svm_model_linear, 'outputs/model.joblib')
-
 
 if __name__ == '__main__':
     main()
