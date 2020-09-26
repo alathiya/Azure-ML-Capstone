@@ -34,16 +34,6 @@ def main():
     run.log('Kernel type', np.str(args.kernel))
     run.log('Penalty', np.float(args.penalty))
 
-    # loading the iris dataset
-    #iris = datasets.load_iris()
-
-    # X -> features, y -> label
-    #X = iris.data
-    #y = iris.target
-
-    
-
-    key = "Heart-Failure"
 
     heart_dataset = Dataset.get_by_name(workspace=ws, name='Heart-Failure')
     df = heart_dataset.to_pandas_dataframe()
@@ -61,11 +51,10 @@ def main():
 
     # model accuracy for X_test
     accuracy = accuracy_score(svm_predictions, y_test)
+
     #print('Accuracy of SVM classifier on test set: {:.2f}'.format(accuracy))
-    run.log('accuracy', np.float(accuracy))
-    # creating a confusion matrix
-    #cm = confusion_matrix(y_test, svm_predictions)
-    #print(cm)
+    run.log('Accuracy', np.float(accuracy))
+    
 
     os.makedirs('outputs', exist_ok=True)
     # files saved in the "outputs" folder are automatically uploaded into run history
