@@ -73,8 +73,6 @@ I came with up two sets of hyperparameter ranges for tunning job listed below:
 
 
 ### Results
-*TODO*: What are the results you got with your model? What were the parameters of the model? How could you have improved it?
-
 With Accuracy as primary evaluation metric and goal to maximize the primary metric hyperparameter tunning job was configured with sets of parameters ranges listed below: 
 
 - Kernel - 'linear', 'rbf', 'poly', 'sigmoid'
@@ -82,10 +80,21 @@ With Accuracy as primary evaluation metric and goal to maximize the primary metr
 
 These parameter range covers all combinations from mapping simple model to highly complex model. 
 
-*TODO* Remeber to provide screenshots of the `RunDetails` widget as well as a screenshot of the best model trained with it's parameters.
-
 Below snapshot shows the output from `RunDetails` widget. 
 ![RunDetails](hyperdrive_rundetail_1.png)
+
+Below snapshot shows the best model trained with highest Accuracy of 0.81333 and hyper parameter configuration for the best run. 
+![bestmodel1](bestmodel1.JPG)
+![bestmodel2](bestmodel2.JPG)
+
+Additional snapshots from Azure ML studio: 
+![AllRuns](allruns.JPG)
+![metricplot](metricplot.JPG)
+
+Listed below are some of the suggested improvements: 
+1. Model can be further improved by adding more hyperparameters like gamma and probability with suitable range of values. 
+2. kfold cross validation can be added to validate the robustness of model. 
+3. There is scope to increase the size of training data. Adding more data can build more preditable and efficient model. 
 
 ## Model Deployment
 *TODO*: Give an overview of the deployed model and instructions on how to query the endpoint with a sample input.
