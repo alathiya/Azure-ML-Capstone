@@ -108,7 +108,7 @@ Best model is retrieved by calling get_output() on experiment as shown below:
 Best model weights is saved using joblib.dump as shown below:
 ![Best_Model1](besttrained_model.JPG)
 
-**Best AutoML run had accuracy score of 0.88616**
+**Best AutoML run has accuracy score of 0.88616**
 ![Best_Model2](bestmodel.JPG)
 
 Listed below are some of the suggested improvements: 
