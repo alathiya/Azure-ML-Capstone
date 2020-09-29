@@ -1,5 +1,3 @@
-*NOTE:* This file is a template that you can use to create the README for your project. The *TODO* comments below will highlight the information you should be sure to include.
-
 # Heart Failure Prediction Capstone Project 
 
 This project leverages AutoML and Hyperdrive capabilities of Azure ML platform to build and deploy Heart Failure death event prediction classification model. Project soure is from kaggle competition [Heart Failure Prediction](https://www.kaggle.com/andrewmvd/heart-failure-clinical-data). This project will demonstrate ability to use an external dataset in your workspace, train a model using the different tools available in the AzureML framework as well as ability to deploy the model as a web service. Results from both approachs(automl and hyperdrive) will be compared and best chosen model will be deployed using python SDK for Azure ML.  
@@ -53,7 +51,6 @@ heart_dataset = Dataset.get_by_name(workspace=ws, name='Heart-Failure')
 From the run context, reference to experiment running under workspace is returned. Then dataset get_by_name method returns the reference to dataset when workspace and dataset name is passed as arguments. 
 
 ## Automated ML
-*TODO*: Give an overview of the `automl` settings and configuration you used for this experiment
 
 AutoML settings represents the configuration for submitting an automated ML experiment in Azure Machine Learning. This configuration object contains and persists the parameters for configuring the experiment run, as well as the training data to be used at run time. 
 
@@ -82,7 +79,6 @@ Configuration used for this experiments are discussed below:
 - debug_log: The log file to write debug information to. If not specified, 'automl.log' is used.
 
 ### Results
-*TODO*: What are the results you got with your automated ML model? What were the parameters of the model? How could you have improved it?
 
 With Accuracy as primary evaluation metric and goal to maximize the primary metric automl job was configured with automl_settings and AutoMLConfig settings as shown below:
 ```
@@ -101,19 +97,26 @@ automl_config = AutoMLConfig(task = "classification",
                              **automl_settings)
 ```
 
+Below snapshot shows the output from `RunDetails` widget. 
+![RunDetails_AutoMl1](Runwidget_automl.JPG)
+![RunDetails_AutoMl2](Accuracy_Metric.JPG)
+
+Best model is retrieved by calling get_output() on experiment as shown below:
+![BestExp_AutoMl1](bestexp_automl1.JPG)
+![BestExp_AutoMl2](bestexp_automl2.JPG)
+
+Best model weights is saved using joblib.dump as shown below:
+![Best_Model1](besttrained_model.JPG)
+
+**Best AutoML run had accuracy score of 0.88616**
+![Best_Model2](bestmodel.JPG)
 
 Listed below are some of the suggested improvements: 
 1. We can remove the experiment_time_out settings from configuration and set the enable_early_stopping=True. This would allow model to train for atleast 20 iterations and training continues until no improvement in primary metric is recorded for n iterations as configured. 
 2. With GPU enabled cluster compute number of iteration can be increased so that total number of different algorithm and parameter combinations can be tested during an automated ML experiment. This would further improve the accuracy score. 
 3. Using experiment_exit_score in exit criteria completes the experiment after a specified primary metric score has been reached. This way desired metric score can be achieved.  
 
-*TODO* Remeber to provide screenshots of the `RunDetails` widget as well as a screenshot of the best model trained with it's parameters.
-
-Below snapshot shows the output from `RunDetails` widget. 
-
-
 ## Hyperparameter Tuning
-*TODO*: What kind of model did you choose for this experiment and why? Give an overview of the types of parameters and their ranges used for the hyperparameter search
 
 Support Vector classifier from SKLearn library is chosen for this task. SVC is good classifier for binary classification task when input feature space has many dimensions. SVC provides different kernel like rbf, poly, linear etc which can classify sample data in high dimensional space with many features and can map inherent complexities in data. Since we don't know beforehand if data will be seperable in linear dimensional space or requries rbf kernal to map high complexities, this is where benefit of SVC is leveraged as it can trained on range of kernel values as hyperparameter. Penalty parameter can be added as regularisation term to reduce overfitting in training process. 
 
@@ -135,7 +138,7 @@ These parameter range covers all combinations from mapping simple model to highl
 Below snapshot shows the output from `RunDetails` widget. 
 ![RunDetails](hyperdrive_rundetail_1.png)
 
-Below snapshot shows the best model trained with highest Accuracy of 0.81333 and hyper parameter configuration for the best run. 
+**Below snapshot shows the best model trained with highest Accuracy of 0.81333 and hyper parameter configuration for the best run.** 
 ![bestmodel1](bestmodel1.JPG)
 ![bestmodel2](bestmodel2.JPG)
 
