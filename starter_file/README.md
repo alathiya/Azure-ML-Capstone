@@ -55,10 +55,62 @@ From the run context, reference to experiment running under workspace is returne
 ## Automated ML
 *TODO*: Give an overview of the `automl` settings and configuration you used for this experiment
 
+AutoML settings represents the configuration for submitting an automated ML experiment in Azure Machine Learning. This configuration object contains and persists the parameters for configuring the experiment run, as well as the training data to be used at run time. 
+
+Configuration used for this experiments are discussed below:
+
+- experiment_timeout_minutes: Its an exit criteria in settings to define how long, in minutes, experiment should continue to run. To help avoid experiment time out failures, there is a minimum of 15 minutes, or 60 minutes if your row by column size exceeds 10 million. I have set it to 20mins for this automl run.
+
+- max_concurrent_iterations:  Represents the maximum number of iterations that would be executed in parallel. The default value is 1. In this configuration I have set it to 4 as it should be less than or equal to the maximum number of nodes. Otherwise, runs will be queued until nodes are available.
+
+- primary_metric: The metric that Automated Machine Learning will optimize for model selection. In this setting we have used Accuracy as primary metric. Also its a default metric for classification task. 
+
+- n_cross_validations: Specifies how many cross validations to perform when user validation data is not specified. In this setting we have used 5 to represent 5-fold cross validation. It further validates the robustness of model. 
+
+- featurization: Represents 'auto' / 'off' / FeaturizationConfig Indicator for whether featurization step should be done automatically or not, or whether customized featurization should be used. In this setting we have set it to 'auto'. Column type is automatically detected. Based on the detected column type preprocessing/featurization is done as follows:
+    - Categorical: Target encoding, one hot encoding, drop high cardinality categories, impute missing values.
+    - Numeric: Impute missing values, cluster distance, weight of evidence.
+    - DateTime: Several features such as day, seconds, minutes, hours etc.
+    - Text: Bag of words, pre-trained Word embedding, text target encoding.
+
+- task: The type of task to run. Values can be 'classification', 'regression', or 'forecasting' depending on the type of automated ML problem to solve. In this setting we have set it to 'classification' task. 
+
+- training_data: The training data to be used within the experiment. It should contain both training features and a label column (optionally a sample weights column). If training_data is specified, then the label_column_name parameter must also be specified.
+
+- label_column_name: The name of the label column. If the input data is from a pandas. DataFrame which doesn't have column names, column indices can be used instead, expressed as integers.
+
+- debug_log: The log file to write debug information to. If not specified, 'automl.log' is used.
+
 ### Results
 *TODO*: What are the results you got with your automated ML model? What were the parameters of the model? How could you have improved it?
 
+With Accuracy as primary evaluation metric and goal to maximize the primary metric automl job was configured with automl_settings and AutoMLConfig settings as shown below:
+```
+automl_settings = {
+    "experiment_timeout_minutes": 20,
+    "max_concurrent_iterations": 4,
+    "primary_metric" : 'Accuracy',
+    "n_cross_validations": 5,
+    "featurization": 'auto'
+}
+
+automl_config = AutoMLConfig(task = "classification",
+                             training_data=dataset,
+                             label_column_name="DEATH_EVENT",   
+                             debug_log = "automl_errors.log",
+                             **automl_settings)
+```
+
+
+Listed below are some of the suggested improvements: 
+1. We can remove the experiment_time_out settings from configuration and set the enable_early_stopping=True. This would allow model to train for atleast 20 iterations and training continues until no improvement in primary metric is recorded for n iterations as configured. 
+2. With GPU enabled cluster compute number of iteration can be increased so that total number of different algorithm and parameter combinations can be tested during an automated ML experiment. This would further improve the accuracy score. 
+3. Using experiment_exit_score in exit criteria completes the experiment after a specified primary metric score has been reached. This way desired metric score can be achieved.  
+
 *TODO* Remeber to provide screenshots of the `RunDetails` widget as well as a screenshot of the best model trained with it's parameters.
+
+Below snapshot shows the output from `RunDetails` widget. 
+
 
 ## Hyperparameter Tuning
 *TODO*: What kind of model did you choose for this experiment and why? Give an overview of the types of parameters and their ranges used for the hyperparameter search
