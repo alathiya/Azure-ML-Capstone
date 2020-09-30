@@ -124,7 +124,7 @@ I came with up two sets of hyperparameter ranges for tunning job listed below:
 
 - penalty(C:float, default=1.0) - Regularization parameter. The strength of the regularization is inversely proportional to C. Must be strictly positive. The penalty is a squared l2 penalty.
 
-- kernel - {‘linear’, ‘poly’, ‘rbf’, ‘sigmoid’, ‘precomputed’}, default=’rbf’ Specifies the kernel type to be used in the algorithm. It must be one of ‘linear’, ‘poly’, ‘rbf’, ‘sigmoid’, ‘precomputed’ or a callable. If none is given, ‘rbf’ will be used. If a callable is given it is used to pre-compute the kernel matrix from data matrices; that matrix should be an array of shape (n_samples, n_samples).
+- kernel - ('linear', 'poly', 'rbf', 'sigmoid', 'precomputed'), default='rbf' Specifies the kernel type to be used in the algorithm. It must be one of 'linear', 'poly', 'rbf', 'sigmoid', 'precomputed' or a callable. If none is given, 'rbf' will be used. If a callable is given it is used to pre-compute the kernel matrix from data matrices; that matrix should be an array of shape (n_samples, n_samples).
 
 
 ### Results
@@ -152,7 +152,74 @@ Listed below are some of the suggested improvements:
 3. There is scope to increase the size of training data. Adding more data can build more preditable and efficient model. 
 
 ## Model Deployment
-*TODO*: Give an overview of the deployed model and instructions on how to query the endpoint with a sample input.
+From both the experiments AutoML and Hyperdive we can observe the accuracy score of AutoML is significantly much better compared to accuracy score of Hyperdrive. Given that we decide to choose best Auto ML model for further deployment. 
+
+    Auto ML Accuracy score - 0.88616
+    Hyperdrive Accuracy score - 0.81333  
+
+Model is deployed as webservice on local machine so that its eaiser to debug and test the results. Below workflow is similar no matter where the model is deployed. 
+
+- Register the model: A registered model is a logical container for one or more files that make up model. Model weight file, name and workspace reference is passed to register function to register the model with version number.   
+```
+model = Model.register(model_path="best-trained-model.pkl",
+                       model_name="best-trained-model",
+                       workspace = ws)
+```                       
+
+- Prepare an inference configuration: An inference configuration describes how to set up the web-service containing model. It's used later, when we deploy the model. Script entry file and curated environment from your workspace is configured. The AzureML-Tutorial environment contains common data science packages. These packages include Scikit-Learn, Pandas, Matplotlib, and a larger set of azureml-sdk packages.
+```
+env = Environment.get(workspace=ws, name="AzureML-Tutorial")
+inference_config = InferenceConfig(entry_script='score.py', environment=env)
+```
+
+- Prepare an entry script: The entry script receives data submitted to a deployed web service and passes it to the model. It then takes the response returned by the model and returns that to the client. The two things we have  accomplish in entry script are:
+    - Loading your model (using a function called init())
+    - Running your model on input data (using a function called run())
+
+- Choose a compute target: The deployment configuration is specific to the compute target that will host the web service. We have used local instance to deploy the model at port=6789
+```
+deployment_conf = LocalWebservice.deploy_configuration(port=6789)
+```
+
+- Deploy the model to the compute target: Finally model is deployed with these settings as shown below: 
+```
+service = Model.deploy(workspace=ws,
+                          name=service_name,
+                          models=[model],
+                          inference_config=inference_config,
+                          deployment_config=deployment_conf)
+```
+
+- Test the resulting web service: Deploying an Azure Machine Learning model as a web service creates a REST API endpoint. We can than send data to this endpoint and receive the prediction returned by the model. The REST API expects the body of the request to be a JSON document with the following structure:
+```
+{
+    "data":
+        [
+            <model-specific-data-structure>
+        ]
+}
+```
+In the header section of Rest API we specify the format of body which is 'application/json' content and scoring uril is retrieved from **service.scoring_uri**. 
+These arguments are send to Rest API post request and response is returned in JSON format. 
+```
+resp = requests.post(scoring_uri, input_data, headers=headers)
+```
+
+###Logging and Cleanup
+
+Logs are retrieved and displayed for endpoint API calls using **service.get_logs()** method. 
+```
+logs = service.get_logs()
+
+for line in logs.split('\n'):
+    print(line)
+```
+
+After usage deployed webservice is deleted. 
+```
+service.delete(delete_cache=True, delete_image=False, delete_volume=True)
+``` 
+
 
 ## Screen Recording
 *TODO* Provide a link to a screen recording of the project in action. Remember that the screencast should demonstrate:
