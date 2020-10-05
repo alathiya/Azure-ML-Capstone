@@ -1,4 +1,3 @@
-##%%writefile score.py
 import json
 import numpy as np
 import os
@@ -13,19 +12,18 @@ def init():
     model_path = os.path.join(os.getenv('AZUREML_MODEL_DIR'), 'best-trained-model.pkl')
     model = joblib.load(model_path)
 
-#def run(raw_data):
-#    data = np.array(json.loads(raw_data)['data'])
-#    # make prediction
-#    y_hat = model.predict(data)
-#    # you can return any data type as long as it is JSON-serializable
-#    return y_hat.tolist()
-
 def run(data):
     try:
-        data = np.array(json.loads(data))
+        #data = np.array(json.loads(data))
+        #result = model.predict(data)
+        ## You can return any data type, as long as it is JSON serializable.
+        #return result.tolist()
+
+        data = json.loads(data)['data']
+        data = np.array(data)
         result = model.predict(data)
-        # You can return any data type, as long as it is JSON serializable.
-        return result.tolist()
+        return json.dumps({"result": result.tolist()})
+
     except Exception as e:
         error = str(e)
-        return error
+        return json.dumps({"error": error})
