@@ -3,6 +3,7 @@ import numpy as np
 import os
 import pickle
 import joblib
+import pandas as pd
 
 def init():
     global model
@@ -20,7 +21,7 @@ def run(data):
         #return result.tolist()
 
         data = json.loads(data)['data']
-        data = np.array(data)
+        data = pd.DataFrame.from_dict(data)
         result = model.predict(data)
         return json.dumps({"result": result.tolist()})
 

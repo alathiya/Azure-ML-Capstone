@@ -168,7 +168,7 @@ model = Model.register(model_path="best-trained-model.pkl",
 
 - Prepare an inference configuration: An inference configuration describes how to set up the web-service containing model. It's used later, when we deploy the model. Script entry file and curated environment from your workspace is configured. The AzureML-Tutorial environment contains common data science packages. These packages include Scikit-Learn, Pandas, Matplotlib, and a larger set of azureml-sdk packages.
 ```
-env = Environment.get(workspace=ws, name="AzureML-Tutorial")
+env = Environment.get(workspace=ws, name="AzureML-AutoML")
 inference_config = InferenceConfig(entry_script='score.py', environment=env)
 ```
 
@@ -204,8 +204,13 @@ These arguments are send to Rest API post request and response is returned in JS
 ```
 resp = requests.post(scoring_uri, input_data, headers=headers)
 ```
+### Screenshot showing sample request and its response. 
+![Deployed_Model_sample_request.JPG](Deployed_Model_sample_request.JPG)
 
-###Logging and Cleanup
+### Screenshot showing active deployed model URI. 
+![Deployed_Model_URI.JPG](Deployed_Model_URI.JPG)
+
+### Logging and Cleanup
 
 Logs are retrieved and displayed for endpoint API calls using **service.get_logs()** method. 
 ```
@@ -222,10 +227,6 @@ service.delete(delete_cache=True, delete_image=False, delete_volume=True)
 
 
 ## Screen Recording
-*TODO* Provide a link to a screen recording of the project in action. Remember that the screencast should demonstrate:
-- A working model
-- Demo of the deployed  model
-- Demo of a sample request sent to the endpoint and its response
 
-## Standout Suggestions
-*TODO (Optional):* This is where you can provide information about any standout suggestions that you have attempted.
+Please find below link for screencast to working model, demo of the deployment and sample execution of request and its response.
+https://youtu.be/tpv5B02rSA0
